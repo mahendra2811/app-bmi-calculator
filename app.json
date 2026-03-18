@@ -8,8 +8,8 @@
     "scheme": "bmi-calculator",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "cover",
+      "image": "./assets/images/logo.png",
+      "resizeMode": "contain",
       "backgroundColor": "#0F0C29"
     },
     "android": {
@@ -17,9 +17,12 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundColor": "#0F0C29"
       },
-      "package": "com.yourname.bmicalculator",
+      "package": "com.mahendra.bmicalculator",
       "versionCode": 1,
-      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"]
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
     },
     "ios": {
       "supportsTablet": true
@@ -35,6 +38,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3006cbb9-44f3-47c7-a903-40a0fc478803"
+      }
+    },
+    "owner": "mahi0092"
   }
 }
