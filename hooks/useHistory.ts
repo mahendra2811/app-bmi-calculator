@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { HistoryEntry } from '../types';
 import { storeData, getData } from '../utils/storage';
 import { STORAGE_KEYS } from '../utils/constants';
@@ -14,21 +15,27 @@ export function useHistory() {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    refreshHistory();
-  }, [refreshHistory]);
+  // Auto-refresh whenever the screen using this hook gains focus
+  useFocusEffect(
+    useCallback(() => {
+      refreshHistory();
+    }, [refreshHistory])
+  );
 
   const addEntry = useCallback(async (entry: HistoryEntry) => {
-    const updated = [entry, ...history];
-    setHistory(updated);
+    // Read fresh from storage to avoid stale closure issues
+    const current = await getData<HistoryEntry[]>(STORAGE_KEYS.HISTORY);
+    const updated = [entry, ...(current || [])];
     await storeData(STORAGE_KEYS.HISTORY, updated);
-  }, [history]);
+    setHistory(updated);
+  }, []);
 
   const deleteEntry = useCallback(async (id: string) => {
-    const updated = history.filter((e) => e.id !== id);
-    setHistory(updated);
+    const current = await getData<HistoryEntry[]>(STORAGE_KEYS.HISTORY);
+    const updated = (current || []).filter((e) => e.id !== id);
     await storeData(STORAGE_KEYS.HISTORY, updated);
-  }, [history]);
+    setHistory(updated);
+  }, []);
 
   const clearHistory = useCallback(async () => {
     setHistory([]);

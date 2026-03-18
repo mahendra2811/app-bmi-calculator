@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Alert, Share, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Share, TextInput, Platform, Linking, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import GradientBackground from '../../components/layout/GradientBackground';
 import SafeContainer from '../../components/layout/SafeContainer';
@@ -10,22 +10,82 @@ import { useSettings } from '../../hooks/useSettings';
 import { useTheme } from '../../hooks/useTheme';
 import { useHistory } from '../../hooks/useHistory';
 
+function InlineConfirm({
+  emoji,
+  label,
+  confirmLabel,
+  danger,
+  onConfirm,
+}: {
+  emoji: string;
+  label: string;
+  confirmLabel: string;
+  danger?: boolean;
+  onConfirm: () => void;
+}) {
+  const [confirming, setConfirming] = useState(false);
+
+  if (confirming) {
+    return (
+      <View className="flex-row items-center justify-between py-4 border-b border-white/10">
+        <Text className="text-white/60 text-sm">Are you sure?</Text>
+        <View className="flex-row gap-3">
+          <Pressable onPress={() => setConfirming(false)}>
+            <Text className="text-white/50 text-sm">Cancel</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => { onConfirm(); setConfirming(false); }}
+            className="bg-red-500/20 rounded-lg px-3 py-1"
+          >
+            <Text className="text-red-400 text-sm font-bold">{confirmLabel}</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <SettingsRow
+      emoji={emoji}
+      label={label}
+      danger={danger}
+      onPress={() => setConfirming(true)}
+    />
+  );
+}
+
+async function shareText(text: string, title?: string) {
+  try {
+    if (Platform.OS === 'web') {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        await navigator.share({ text, title });
+      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+      }
+    } else {
+      await Share.share({ message: text, title });
+    }
+  } catch {
+    // User cancelled
+  }
+}
+
 export default function SettingsScreen() {
   const router = useRouter();
   const { settings, updateSettings, resetSettings } = useSettings();
   const { isDark, toggleTheme } = useTheme();
   const { history, clearHistory } = useHistory();
+  const [exportDone, setExportDone] = useState(false);
 
   const lastBmi = history.length > 0 ? history[0] : null;
 
   const exportHistory = async () => {
-    if (history.length === 0) {
-      Alert.alert('No Data', 'No history to export.');
-      return;
-    }
+    if (history.length === 0) return;
     const csv = 'Date,BMI,Category,Weight,Height,Age,Gender\n' +
       history.map((h) => `${h.date},${h.bmi},${h.category},${h.weight},${h.height},${h.age},${h.gender}`).join('\n');
-    await Share.share({ message: csv, title: 'BMI History Export' });
+    await shareText(csv, 'BMI History Export');
+    setExportDone(true);
+    setTimeout(() => setExportDone(false), 2000);
   };
 
   return (
@@ -87,31 +147,32 @@ export default function SettingsScreen() {
 
         <FadeIn delay={300}>
           <Text className="text-white/50 text-xs uppercase tracking-wider mb-3">Data</Text>
-          <View className="bg-white/[0.08] border border-white/[0.12] rounded-3xl mb-6">
-            <SettingsRow emoji="📤" label="Export History" showChevron onPress={exportHistory} />
+          <View className="bg-white/[0.08] border border-white/[0.12] rounded-3xl mb-6 px-3">
             <SettingsRow
+              emoji="📤"
+              label={exportDone ? 'Exported!' : (history.length === 0 ? 'No History to Export' : 'Export History')}
+              showChevron={history.length > 0 && !exportDone}
+              onPress={exportHistory}
+            />
+            <InlineConfirm
               emoji="🗑️"
               label="Clear All History"
+              confirmLabel="Clear"
               danger
-              onPress={() => Alert.alert('Clear History', 'This will delete all your BMI history.', [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Clear', style: 'destructive', onPress: clearHistory },
-              ])}
+              onConfirm={clearHistory}
             />
-            <SettingsRow
+            <InlineConfirm
               emoji="🔄"
               label="Reset Settings"
-              onPress={() => Alert.alert('Reset', 'Restore default settings?', [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Reset', onPress: resetSettings },
-              ])}
+              confirmLabel="Reset"
+              onConfirm={resetSettings}
             />
           </View>
         </FadeIn>
 
         <FadeIn delay={400}>
           <Text className="text-white/50 text-xs uppercase tracking-wider mb-3">Legal & Info</Text>
-          <View className="bg-white/[0.08] border border-white/[0.12] rounded-3xl mb-6">
+          <View className="bg-white/[0.08] border border-white/[0.12] rounded-3xl mb-6 px-3">
             <SettingsRow emoji="🔒" label="Privacy Policy" showChevron onPress={() => router.push('/privacy-policy')} />
             <SettingsRow emoji="📜" label="Terms & Conditions" showChevron onPress={() => router.push('/terms-conditions')} />
             <SettingsRow emoji="⚠️" label="Medical Disclaimer" showChevron onPress={() => router.push('/disclaimer')} />
@@ -125,9 +186,21 @@ export default function SettingsScreen() {
         </FadeIn>
 
         <FadeIn delay={500}>
+          <View className="bg-white/[0.08] border border-white/[0.12] rounded-3xl mb-6 px-3">
+            <SettingsRow
+              emoji="⭐"
+              label="Rate this App"
+              showChevron
+              onPress={() => Linking.openURL('https://play.google.com/store')}
+            />
+            <SettingsRow
+              emoji="📤"
+              label="Share App"
+              showChevron
+              onPress={() => shareText('Check out BMI Calculator — track your health journey!', 'BMI Calculator')}
+            />
+          </View>
           <View className="items-center mb-8">
-            <SettingsRow emoji="⭐" label="Rate this App" showChevron onPress={() => Alert.alert('Rate', 'This would open the Play Store.')} />
-            <SettingsRow emoji="📤" label="Share App" showChevron onPress={() => Share.share({ message: 'Check out BMI Calculator app!' })} />
             <Text className="text-white/30 text-xs mt-4">v1.0.0</Text>
             <Text className="text-white/30 text-xs mt-1">Made with ❤️ by Mahendra</Text>
           </View>
