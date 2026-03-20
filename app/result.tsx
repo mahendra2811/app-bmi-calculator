@@ -7,7 +7,7 @@ import PageHeader from '../components/layout/PageHeader';
 import BMIGauge from '../components/ui/BMIGauge';
 import StatCard from '../components/ui/StatCard';
 import GradientButton from '../components/ui/GradientButton';
-import AdBannerPlaceholder from '../components/ui/AdBannerPlaceholder';
+// Phase 2: import AdBannerPlaceholder from '../components/ui/AdBannerPlaceholder';
 import FadeIn from '../components/animations/FadeIn';
 import StaggerList from '../components/animations/StaggerList';
 import { useHistory } from '../hooks/useHistory';
@@ -123,7 +123,7 @@ export default function ResultScreen() {
           </View>
         </FadeIn>
 
-        <AdBannerPlaceholder />
+        {/* Phase 2: <AdBannerPlaceholder /> */}
       </SafeContainer>
     </GradientBackground>
   );

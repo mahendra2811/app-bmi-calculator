@@ -13,14 +13,16 @@ export const privacyPolicy = {
       title: 'Local Data Storage',
       content: 'All health-related data (BMI calculations, history entries, and user preferences) is stored exclusively on your device using local storage (AsyncStorage). This data never leaves your device and is not transmitted to any external servers. You have full control over your data and can delete it at any time through the Settings screen in the app.',
     },
-    {
-      title: 'Third-Party Advertising (Google AdMob)',
-      content: 'Our App may display advertisements provided by Google AdMob. The Google AdMob SDK may collect certain device information, including but not limited to: device identifiers (advertising ID), IP address, device type and model, operating system version, and general location data (based on IP). Google uses this information to serve relevant advertisements. You can opt out of personalized advertising through your device settings. For more information, please refer to Google\'s Privacy Policy at policies.google.com/privacy.',
-    },
-    {
-      title: 'Analytics (Firebase Analytics)',
-      content: 'We may use Firebase Analytics to collect anonymous usage data to improve our App. This may include: app usage patterns, feature interaction data, crash reports, device type and operating system, and general geographic region. This data is collected in aggregate and cannot be used to identify individual users. You can opt out of analytics collection through your device settings.',
-    },
+    // Phase 2: Uncomment when AdMob is integrated
+    // {
+    //   title: 'Third-Party Advertising (Google AdMob)',
+    //   content: 'Our App may display advertisements provided by Google AdMob. The Google AdMob SDK may collect certain device information, including but not limited to: device identifiers (advertising ID), IP address, device type and model, operating system version, and general location data (based on IP). Google uses this information to serve relevant advertisements. You can opt out of personalized advertising through your device settings. For more information, please refer to Google\'s Privacy Policy at policies.google.com/privacy.',
+    // },
+    // Phase 2: Uncomment when Firebase Analytics is integrated
+    // {
+    //   title: 'Analytics (Firebase Analytics)',
+    //   content: 'We may use Firebase Analytics to collect anonymous usage data to improve our App. This may include: app usage patterns, feature interaction data, crash reports, device type and operating system, and general geographic region. This data is collected in aggregate and cannot be used to identify individual users. You can opt out of analytics collection through your device settings.',
+    // },
     {
       title: 'Data Sharing',
       content: 'We do not sell, trade, or otherwise transfer your personal health data to third parties. The only data that may be shared with third parties is: anonymous analytics data with Firebase/Google Analytics (if enabled), and device information with Google AdMob for advertising purposes. No personal health measurements (height, weight, BMI results) are ever shared.',
@@ -79,10 +81,11 @@ export const termsAndConditions = {
       title: 'Disclaimer of Warranties',
       content: 'THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. We do not warrant that: the App will be error-free or uninterrupted, the calculations will be 100% accurate for all individuals, the health information will be suitable for your specific health situation, or any defects in the App will be corrected. BMI is a general screening tool and may not accurately reflect the health status of all individuals.',
     },
-    {
-      title: 'Advertising',
-      content: 'The App may display third-party advertisements provided by Google AdMob. We are not responsible for the content of these advertisements. Ad display does not constitute endorsement of any product or service. The frequency and placement of ads are determined by our advertising configuration and may change over time.',
-    },
+    // Phase 2: Uncomment when AdMob is integrated
+    // {
+    //   title: 'Advertising',
+    //   content: 'The App may display third-party advertisements provided by Google AdMob. We are not responsible for the content of these advertisements. Ad display does not constitute endorsement of any product or service. The frequency and placement of ads are determined by our advertising configuration and may change over time.',
+    // },
     {
       title: 'Changes to Terms',
       content: 'We reserve the right to modify or replace these Terms at any time at our sole discretion. If we make material changes, we will provide notice through the App. Your continued use of the App after any changes to the Terms constitutes acceptance of the new Terms. We encourage you to review these Terms periodically.',

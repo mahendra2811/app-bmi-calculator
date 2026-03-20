@@ -7,7 +7,7 @@ import GenderSelector from "../../components/ui/GenderSelector";
 import AgeWheel from "../../components/ui/AgeWheel";
 import SliderInput from "../../components/ui/SliderInput";
 import GradientButton from "../../components/ui/GradientButton";
-import AdBannerPlaceholder from "../../components/ui/AdBannerPlaceholder";
+// Phase 2: import AdBannerPlaceholder from "../../components/ui/AdBannerPlaceholder";
 import FadeIn from "../../components/animations/FadeIn";
 import StaggerList from "../../components/animations/StaggerList";
 import { useSettings } from "../../hooks/useSettings";
@@ -113,7 +113,7 @@ export default function CalculatorScreen() {
 
               <GradientButton title="Calculate BMI →" onPress={handleCalculate} />
 
-              <AdBannerPlaceholder />
+              {/* Phase 2: <AdBannerPlaceholder /> */}
             </StaggerList>
           </View>
         </View>

@@ -1,3 +1,5 @@
+// Phase 2: Uncomment when AdMob is integrated
+/*
 import { useState, useCallback } from 'react';
 
 export function useAds() {
@@ -14,4 +16,15 @@ export function useAds() {
   }, []);
 
   return { showBanner, showInterstitial, isAdReady, calculationCount, incrementCalculationCount };
+}
+*/
+
+export function useAds() {
+  return {
+    showBanner: false,
+    showInterstitial: () => {},
+    isAdReady: false,
+    calculationCount: 0,
+    incrementCalculationCount: () => {},
+  };
 }

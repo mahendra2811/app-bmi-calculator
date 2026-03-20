@@ -1,3 +1,5 @@
+// Phase 2: Uncomment when Firebase Analytics is integrated
+/*
 import { useCallback } from 'react';
 
 export function useAnalytics() {
@@ -14,4 +16,13 @@ export function useAnalytics() {
   }, []);
 
   return { trackEvent, setUserProperty, trackScreen };
+}
+*/
+
+export function useAnalytics() {
+  return {
+    trackEvent: (_name: string, _params?: Record<string, unknown>) => {},
+    setUserProperty: (_name: string, _value: string) => {},
+    trackScreen: (_screenName: string) => {},
+  };
 }
