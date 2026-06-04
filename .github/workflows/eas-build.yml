@@ -1,0 +1,96 @@
+name: Build APK & Release
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Java (required for Gradle)
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate native Android folder
+        run: npx expo prebuild --platform android --clean
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/bmi-release.keystore
+
+      - name: Inject signing config into gradle.properties
+        run: |
+          cat >> android/gradle.properties << 'EOF'
+          RELEASE_STORE_FILE=bmi-release.keystore
+          RELEASE_KEY_ALIAS=${{ secrets.KEY_ALIAS }}
+          RELEASE_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
+          EOF
+
+      - name: Patch build.gradle to use release signing
+        run: |
+          sed -i 's/signingConfig signingConfigs.debug/signingConfig signingConfigs.release/' \
+            android/app/build.gradle
+
+          sed -i '/signingConfigs {/a\
+              release {\
+                  storeFile file(RELEASE_STORE_FILE)\
+                  storePassword RELEASE_STORE_PASSWORD\
+                  keyAlias RELEASE_KEY_ALIAS\
+                  keyPassword RELEASE_KEY_PASSWORD\
+              }' android/app/build.gradle
+
+      - name: Build release APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Get version from package.json
+        id: version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Rename APK
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk \
+             bmi-calculator-v${{ steps.version.outputs.VERSION }}.apk
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bmi-calculator-v${{ steps.version.outputs.VERSION }}
+          path: bmi-calculator-v${{ steps.version.outputs.VERSION }}.apk
+
+      - name: Create GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}-build.${{ github.run_number }}
+          name: "BMI Calculator v${{ steps.version.outputs.VERSION }} (Build ${{ github.run_number }})"
+          body: |
+            ### What's in this build
+            - Commit: ${{ github.sha }}
+            - Branch: ${{ github.ref_name }}
+            - Built without EAS — pure Gradle build
+
+            ### Install
+            Download the APK below and install on your Android device.
+          files: bmi-calculator-v${{ steps.version.outputs.VERSION }}.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
