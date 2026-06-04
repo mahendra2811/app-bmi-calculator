@@ -32,6 +32,9 @@ jobs:
       - name: Generate native Android folder
         run: npx expo prebuild --platform android --clean
 
+      - name: Create android/app directory
+        run: mkdir -p android/app
+
       - name: Decode keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/bmi-release.keystore
